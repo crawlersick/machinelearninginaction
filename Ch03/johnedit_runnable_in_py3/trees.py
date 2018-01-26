@@ -179,7 +179,7 @@ def createPlot(inTree):
     fig.clf()
     axprops = dict(xticks=[], yticks=[])
     tcreatePlot.ax1 = plt.subplot(111, frameon=False, **axprops)    #no ticks
-    #createPlot.ax1 = plt.subplot(111, frameon=False) #ticks for demo puropses
+    #tcreatePlot.ax1 = plt.subplot(111, frameon=False) #ticks for demo puropses
     plotTree.totalW = float(getNumLeafs(inTree))
     plotTree.totalD = float(getTreeDepth(inTree))
     plotTree.xOff = -0.5/plotTree.totalW; plotTree.yOff = 1.0;
@@ -206,3 +206,25 @@ print(labels_o)
 classres=classify(tree_t,labels_o,[1,0])
 print(classres)
 
+def storeTree(t,f):
+    import pickle
+    fw=open(f,'wb')
+    pickle.dump(t,fw)
+    fw.close
+
+def grabTree(f):
+    import pickle
+    fr=open(f,'rb')
+    return pickle.load(fr)
+
+storeTree(tree_t,"tree_t_p")
+tree_recover=grabTree("tree_t_p")
+print(tree_recover)
+
+print('now we have the last test on test data lenses.txt')
+fr=open('../lenses.txt')
+lenses=[line.strip().split('\t') for line in fr.readlines()]
+lenlabels=['age','prescript','astigmatic','tearRate']
+lentree=createTree(lenses,lenlabels)
+print(lentree)
+createPlot(lentree)
