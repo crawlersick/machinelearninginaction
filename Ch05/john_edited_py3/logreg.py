@@ -26,13 +26,11 @@ def gradAscent(dataMatIn,classLabels):
         weights=weights+alpha*dataMatrix.transpose()*error
     return weights
 
-dm,lm=loaddata()
-wei=gradAscent(dm,lm)
-print(wei)
 
 def plotBestFit(wei,dm,lm):
     import matplotlib.pyplot as plt
-    weights=wei.getA()
+    #weights=wei.getA()
+    weights=array(wei)
     dataArr=array(dm)
     n=shape(dataArr)[0]
     xcord1=[]
@@ -57,9 +55,45 @@ def plotBestFit(wei,dm,lm):
     plt.ylabel('X2')
     plt.show()
 
+dm,lm=loaddata()
+#wei=gradAscent(dm,lm)
+#print(wei)
+#plotBestFit(wei,dm,lm)
 
-            
+
+def stocGradAscent0(dataMatIn,classLabels):
+    dataMatrix=array(dataMatIn)
+    labelMat=classLabels
+    m,n=shape(dataMatrix)
+    alpha=0.01
+    weights=ones(n)
+    for i in range(m):
+        h=sigmoid(sum(dataMatrix[i]*weights))
+        error=labelMat[i]-h
+        weights=weights + alpha * error * dataMatrix[i]
+    return weights
+
+#wei=stocGradAscent0(dm,lm)
+#print(wei)
+#plotBestFit(wei,dm,lm)
+
+
+def stocGradAscent1(dataMatIn,classLabels,numIter=150):
+    dataMatrix=array(dataMatIn)
+    labelMat=classLabels
+    m,n=shape(dataMatrix)
+    alpha=0.01
+    weights=ones(n)
+    for j in range(numIter):
+        dataIndex=list(range(m))
+        for i in range(m):
+            alpha=4/(1.0+j+i)+0.01
+            rand=int(random.uniform(0,len(dataIndex)))
+            h=sigmoid(sum(dataMatrix[rand]*weights))
+            error=labelMat[rand]-h
+            weights=weights + alpha * error * dataMatrix[rand]
+            del(dataIndex[rand])
+    return weights        
+wei=stocGradAscent1(dm,lm)
+print(wei)
 plotBestFit(wei,dm,lm)
-
-
-
