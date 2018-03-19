@@ -27,24 +27,25 @@ dataArr,labelArr=loadDataSet('../testSet.txt')
 print(dataArr)
 print(labelArr)
 
+
 def smoSimple(dataMatIn,classLabels,C,toler,maxIter):
     dataMatrix=mat(dataMatIn);
     labelMat=mat(classLabels).transpose()
     b=0
     m,n=shape(dataMatrix)
-    alphas=mat(zero((m,1)))
+    alphas=mat(zeros((m,1)))
     it=0
     while(it<maxIter):
         alphaPairsChanged=0
         for i in range(m):
             fXi=float(multiply(alphas,labelMat).T * (dataMatrix*dataMatrix[i,:].T))+b 
             Ei=fXi-float(labelMat[i])
-            if((labelMat[i]*Ei<-toler)and(alphas[i]<C))or((labelMat[i]*Ei>toler)and(alphas[i]>0))
+            if((labelMat[i]*Ei<-toler)and(alphas[i]<C))or((labelMat[i]*Ei>toler)and(alphas[i]>0)):
                 j=selectJrand(i,m)
                 fXj=float(multiply(alphas,labelMat).T * (dataMatrix*dataMatrix[j,:].T))+b
                 Ej=fXj-float(labelMat[j])
-                alphaIold=alphas[i].copy
-                alphaJold=alphas[j].copy
+                alphaIold=alphas[i].copy()
+                alphaJold=alphas[j].copy()
                 if(labelMat[i]!=labelMat[j]):
                     L=max(0,alphas[j]-alphas[i])
                     H=min(C,C+alphas[j]-alphas[i])
@@ -65,7 +66,7 @@ def smoSimple(dataMatIn,classLabels,C,toler,maxIter):
                 if(abs(alphas[j]-alphaJold)<0.00001):
                     print("j not moving enough")
                     continue
-                alphas[i]+=labelMat[j]*labelMat[i]*(alphasJold-alphas[j])
+                alphas[i]+=labelMat[j]*labelMat[i]*(alphaJold-alphas[j])
                 b1=b-Ei-labelMat[i]*(alphas[i]-alphaIold)*dataMatrix[i,:]*dataMatrix[i,:].T- \
                         labelMat[j]*(alphas[j]-alphaJold)*dataMatrix[i,:]*dataMatrix[j,:].T
                 b2=b-Ej-labelMat[i]*(alphas[i]-alphaIold)*dataMatrix[i,:]*dataMatrix[j,:].T- \
@@ -75,11 +76,17 @@ def smoSimple(dataMatIn,classLabels,C,toler,maxIter):
                 else:b=(b1+b2)/2.0
                 alphaPairsChanged+=1
                 print("iter: %d i: %d, pairs changed %d" % (it,i,alphaPairsChanged))
-            if(alphaPairsChanged==0): it=+1    
-            else: it=0
-            print("iteration number: %d" % it)
-        return b,alphas
+        if(alphaPairsChanged==0): it+=1    
+        else: it=0
+        print("iteration number: %d" % it)
+    return b,alphas
+
+
+r_b,r_alphas=smoSimple(dataArr,labelArr,0.6,0.001,40)
+print(r_b)
+print(r_alphas)
                 
+
 
 
 
